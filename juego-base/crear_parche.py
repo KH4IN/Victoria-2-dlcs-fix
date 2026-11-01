@@ -9,8 +9,6 @@ import hashlib
 import os
 import sys
 
-old_root, new_root, out = sys.argv[1:4]
-
 
 def sha(d):
     return hashlib.sha256(d).hexdigest()
@@ -49,23 +47,29 @@ def apply(a, ed):
     return b''.join(o)
 
 
-lines = []
-kept = total = 0
-for dp, _, fn in os.walk(old_root):
-    for name in sorted(fn):
-        p = os.path.join(dp, name)
-        rel = os.path.relpath(p, old_root)
-        with open(p, 'rb') as f:
-            a = f.read()
-        with open(os.path.join(new_root, rel), 'rb') as f:
-            b = f.read()
-        ed = edits(a, b)
-        assert apply(a, ed) == b, rel
-        lines.append(f'F\t{rel}\t{sha(a)}\t{sha(b)}')
-        for at, n, new in ed:
-            lines.append(f'E\t{at}\t{n}\t{base64.b64encode(new).decode()}')
-            kept += n
-        total += len(a)
-with open(out, 'w', encoding='ascii', newline='\n') as f:
-    f.write('\n'.join(lines) + '\n')
-print('archivos', sum(1 for x in lines if x[0] == 'F'), 'cambios', sum(1 for x in lines if x[0] == 'E'), 'tamano parche KB', os.path.getsize(out) // 1024, 'bytes originales', total)
+def main():
+    old_root, new_root, out = sys.argv[1:4]
+    lines = []
+    kept = total = 0
+    for dp, _, fn in os.walk(old_root):
+        for name in sorted(fn):
+            p = os.path.join(dp, name)
+            rel = os.path.relpath(p, old_root)
+            with open(p, 'rb') as f:
+                a = f.read()
+            with open(os.path.join(new_root, rel), 'rb') as f:
+                b = f.read()
+            ed = edits(a, b)
+            assert apply(a, ed) == b, rel
+            lines.append(f'F\t{rel}\t{sha(a)}\t{sha(b)}')
+            for at, n, new in ed:
+                lines.append(f'E\t{at}\t{n}\t{base64.b64encode(new).decode()}')
+                kept += n
+            total += len(a)
+    with open(out, 'w', encoding='ascii', newline='\n') as f:
+        f.write('\n'.join(lines) + '\n')
+    print('archivos', sum(1 for x in lines if x[0] == 'F'), 'cambios', sum(1 for x in lines if x[0] == 'E'), 'tamano parche KB', os.path.getsize(out) // 1024, 'bytes originales', total)
+
+
+if __name__ == '__main__':
+    main()

@@ -14,6 +14,22 @@ python -I upm/upm_fix.py "<copia>/mod/UPM" "<copia>" registro.txt
 
 Después elige **Universal Project Mod** en el launcher. El código del menú con UPM corregido es `DWUE`. Aplica el script a un UPM sin tocar: si ya está corregido, se niega a repetirlo.
 
+## Parche descargable
+
+La [versión de prueba de UPM](https://github.com/KH4IN/Victoria-2-dlcs-fix/releases/tag/upm-prueba-1) hace lo mismo sin instalar Python, con doble clic. Sale de `crear_parche_upm.py`, que compara UPM sin tocar con UPM corregido:
+
+```bash
+python -I upm/crear_parche_upm.py "<UPM_sin_tocar>" "<copia>/mod/UPM" "<copia>" parche.txt
+```
+
+| Dato | Valor |
+|---|---|
+| Archivos | 2.110 cambiados, 8 nuevos y 5 retirados |
+| Contenido | 1 MB de diferencias, frente a los 689 MB del mod |
+| Archivos casi enteros | 48 de localización, 78 KB en total; solo `zz_correcciones.csv` es nuevo |
+
+Los archivos nuevos se crean a partir de los del juego o del mod, y los 5 retirados se guardan en `_copia_antes_de_corregir_UPM`. Se comprobó sobre `UPM.zip` sin tocar: el resultado es idéntico byte a byte a la copia corregida, y se niega a actuar si falta corregir el juego base o si un archivo no coincide.
+
 ## El límite del late game
 
 | Prueba | Resultado |
@@ -23,7 +39,6 @@ Después elige **Universal Project Mod** en el launcher. El código del menú co
 | Población mundial multiplicada hasta 10.400 millones | Sin crash, sin cifras negativas y con elecciones |
 | Dinero multiplicado por 1.000 | Sin crash ni cifras negativas |
 | Número de pops multiplicado hasta unos 97.000 | Sin crash; unos 3,8 KB de memoria por pop |
-
 | Partida guardada adelantada a 2150 | Sigue sin errores en 2151 |
 | Partida guardada adelantada a noviembre de 2250 | Llega a la pantalla normal de fin de partida en 2251 |
 
