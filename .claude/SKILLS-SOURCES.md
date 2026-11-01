@@ -1,0 +1,15 @@
+# Skills de terceros instaladas
+
+| Origen | Qué se instaló | Dónde |
+|---|---|---|
+| nidhinjs/prompt-master | prompt-master | .claude/skills/ |
+| DietrichGebert/ponytail | ponytail, ponytail-audit, -debt, -gain, -help, -review | .claude/skills/ |
+| rtk-ai/rtk | binario v0.49.0 (SHA-256 fijado) + hook PreToolUse | .claude/hooks/install-rtk.sh, .claude/settings.json |
+| affaan-m/ECC | 14 agentes + token-budget-advisor (sin hooks) | .claude/agents/, .claude/skills/ |
+| addyosmani/agent-skills | 25 skills de ingeniería | .claude/skills/ |
+| Leonxlnx/taste-skill | taste-skill | .claude/skills/ |
+| nextlevelbuilder/ui-ux-pro-max-skill | ui-ux-pro-max, design, design-system, brand, banner-design, slides, ui-styling | .claude/skills/ |
+| microsoft/playwright-cli | playwright-cli (requiere `npm i -g @playwright/cli@0.1.23`) | .claude/skills/ |
+| VoltAgent/awesome-design-md | 84 DESIGN.md de referencia (no es una skill) | docs/awesome-design-md/ |
+
+Copiadas de la rama por defecto de cada repo el 2026-11-01. Se eliminaron las carpetas `tests/` incluidas.
