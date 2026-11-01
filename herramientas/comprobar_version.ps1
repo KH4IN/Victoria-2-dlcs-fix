@@ -19,11 +19,11 @@ function Listar($raiz, $prefijo) {
 $mods = @(Get-ChildItem (Join-Path $juego 'mod') -Filter '*.mod')
 Write-Host ''
 Write-Host '¿Con qué vais a jugar?'
-Write-Host '  0) Juego original, sin mods'
+Write-Host '  0) Juego sin mods'
 for ($i = 0; $i -lt $mods.Count; $i++) { Write-Host ("  {0}) {1}" -f ($i + 1), $mods[$i].BaseName) }
 $r = Read-Host 'Elige un número'
 if ($r -notmatch '^\d+$' -or [int]$r -gt $mods.Count) { Write-Host 'Opción no válida.'; exit 1 }
-$nombre = 'original'
+$nombre = 'juego'
 $lista = @(Listar $juego '')
 $lista += [pscustomobject]@{ Ruta = 'v2game.exe'; Archivo = (Join-Path $juego 'v2game.exe') }
 if ([int]$r -gt 0) {
@@ -49,8 +49,8 @@ Write-Host "Tu huella es: $todo"
 Write-Host 'Si tus amigos tienen esta misma huella, tenéis exactamente los mismos archivos.'
 Write-Host "Se ha guardado en: $salida"
 Write-Host ''
-Write-Host 'Si la huella coincide pero el código del juego (abajo a la izquierda) no, abre y cierra el juego con'
-Write-Host '"Jugar.bat" una vez: es la caché del mapa, que se crea la primera vez.'
+Write-Host 'Si la huella coincide pero el código del juego (abajo a la izquierda) no, abre y cierra el juego'
+Write-Host 'una vez: es la caché del mapa, que se crea la primera vez.'
 
 if (-not $Comparar) {
   Write-Host ''

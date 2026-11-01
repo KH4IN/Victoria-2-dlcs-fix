@@ -77,7 +77,7 @@ try {
       if ($noAnsi.Count) { Write-Host "Aviso: $($noAnsi.Count) archivos usan UTF-8 con BOM y pueden dar problemas en el juego." }
       if (Test-Path (Join-Path $final 'map\default.map')) {
         $ud = [regex]::Match($texto, '(?m)^\s*user_dir\s*=').Success
-        if (-not $ud) { Write-Host 'Aviso: este mod cambia el mapa y no tiene user_dir. Usa Jugar.bat para que la versión salga bien.' }
+        if (-not $ud) { Write-Host 'Aviso: este mod cambia el mapa y no tiene user_dir. Al activarlo, abre y cierra el juego una vez para que la versión salga bien.' }
       }
     }
   } finally {
@@ -86,4 +86,4 @@ try {
 } finally {
   $z.Dispose()
 }
-Write-Host 'Hecho. Aparecerá en el launcher y en Jugar.bat.'
+Write-Host 'Hecho. Aparecerá en el launcher.'

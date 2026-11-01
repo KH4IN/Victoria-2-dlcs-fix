@@ -1,6 +1,6 @@
-"""Genera el paquete 'Victoria 2 Corregido' a partir del juego base. No modifica ningun archivo del juego.
+"""Corrige directamente los archivos del juego base. Cada archivo original se guarda antes en la copia de seguridad.
 
-Uso: python -I base_fix.py <carpeta_del_juego> <carpeta_mod_destino> <archivo_.mod> <registro.txt>
+Uso: python -I base_fix.py <carpeta_del_juego> <carpeta_copia_de_seguridad> <registro.txt>
 """
 import collections
 import glob
@@ -9,9 +9,10 @@ import re
 import shutil
 import sys
 
-game, dst, modfile, logpath = sys.argv[1:5]
+game, backup, logpath = sys.argv[1:4]
 sys.stdout.reconfigure(encoding='utf-8', errors='replace')
 log = collections.defaultdict(list)
+changed = []
 
 
 def note(c, m):
@@ -24,22 +25,21 @@ def rb(p):
 
 
 def wb(p, d):
-    os.makedirs(os.path.dirname(p), exist_ok=True)
+    b = os.path.join(backup, os.path.relpath(p, game))
+    if not os.path.exists(b):
+        os.makedirs(os.path.dirname(b), exist_ok=True)
+        shutil.copy2(p, b)
     with open(p, 'wb') as f:
         f.write(d)
+    changed.append(os.path.relpath(p, game))
 
 
 def G(*a):
     return os.path.join(game, *a)
 
 
-def D(*a):
-    return os.path.join(dst, *a)
-
-
-if os.path.exists(dst):
-    shutil.rmtree(dst)
-os.makedirs(dst)
+if re.search(rb'REDUCTION_AFTER_RISEING\s*=\s*2\.0', rb(G('common', 'defines.lua'))):
+    sys.exit('Las correcciones ya estan aplicadas en este juego.')
 
 # ---- Textos ---------------------------------------------------------------------------------
 SHORT = {
@@ -65,11 +65,35 @@ SHORT = {
     'yes_foreign_navies': 'Flota importada', 'MILITARY_UNIT_EXPERIENCE': 'Experiencia inicial',
     'yes_slavery_l': 'Esclavismo', 'TRADE_EXPORTED': 'Export.',
     # La cifra de la barra superior es lo ganado ayer, no el balance previsto: el texto lo deja claro.
-    'TOPBAR_FUNDS': 'Ayer ganamos $YESTERDAY$¤ (la cifra entre paréntesis es solo la de ayer y varía mucho; el balance real está en Presupuesto, «Balance diario previsto»). Nuestra reserva monetaria actual es de §Y$CASH$§W¤.',
+    'TOPBAR_FUNDS': 'Ayer ganamos $YESTERDAY$¤ (la cifra entre paréntesis es solo la de ayer y varía mucho: el balance real está en Presupuesto, «Balance diario previsto»). Nuestra reserva monetaria actual es de §Y$CASH$§W¤.',
     'DIPLOMACY_THEY_BETTER_OPINION': 'No podemos dirigir esta acción contra §Y$TARGET$§W, ya que §Y$RECIPIENT$§W tiene una opinión §Y$OPINION$§W de ellos.\\n',
     'DIPLOMACY_THEY_BETTER_OPINION2': 'Necesitan tener al menos la misma opinión de nosotros para poder influirles. Su opinión actual de nosotros es §Y$OPINION$§W.',
     'EVTDESC3004': "Ante una opinión pública poco favorable a nuevas reformas sociales, algunos ciudadanos de uno de nuestros estados han decidido ocuparse por su cuenta de los más desfavorecidos y han fundado una 'Sociedad de Amigos'. La sociedad se dedica a diversas tareas de asistencia: alimentos para los ancianos, empleo y educación religiosa para los pobres, y además gestiona una casa de trabajo cooperativa con esos fines.",
     'EVTDESC4408': "...y me parece una auténtica farsa que, mientras nuestro pueblo trabaja bajo el yugo de la pobreza, la insalubridad y la degradación moral, nuestro parlamento insista en gastar millones y millones en pólvora y cañones. Nuestra nación debe ir a la guerra, caballeros: una guerra contra los males que aquejan a nuestra sociedad.'\\n\\nUno de los miembros de nuestro gabinete se ha dirigido al parlamento con un largo discurso que expone la política antimilitarista del gobierno. ¿Cómo deberíamos aprovechar esto?",
+    # Variables mal escritas o frases que decian otra cosa que el texto ingles.
+    'CB_JUSTIFY_NO_LONGER_VALID_LOG': 'Nuestro proceso de justificación de la guerra contra $TARGET$ ya no es válido.',
+    'WAR_OTHER_ACCEPT_LOG': '$AGRESSOR$ ha declarado la guerra a $DEFENDER$.',
+    'WAR_THEY_ACCEPT_LOG': 'Hemos declarado la guerra a $DEFENDER$.',
+    'INVESTED_IN_US_1': '¡$ICOUNTRY$ ha invertido en nosotros!',
+    'INVESTED_IN_US_BUILD': '$INAME$ construida en $ILOCATION$ por $IAMOUNT$¤',
+    'INVESTED_IN_US_LOG': '§Y$ICOUNTRY$§! ha invertido en nosotros: $INVESTED_IN_US_MESSAGE$',
+    'GUNBOAT_ALREADY_ACTIVE': 'Ya les amenaza $COUNTRY$.',
+    'GAIN_CB': 'Gana casus belli de tipo $TYPE$ sobre §Y$WHO$§W.\\n',
+    'REV_GAIN_CB': '§Y$ACTIVE$§W gana un casus belli de tipo $TYPE$ sobre §Y$PASSIVE$§W.\\n',
+    'COLONY_FAIL_5': '$OTHER$, llevado por la codicia, ha reclamado la región.',
+    'ATTACKTHEM_MAP': 'Comenzó ataque',
+    'TRIGMOD_BTN1': 'Aceptar',
+    'TRIGMOD_BTN2': 'Aceptar',
+    'IDEOLOGY_IS_EQUAL_TO_TRIGGER': 'El partido gobernante es §Y$NAME$§W.\\n',
+    'IDEOLOGY_IS_NOT_TRIGGER': 'El partido gobernante NO es §Y$NAME$§W.\\n',
+    'TOPBAR_DIPLOPOINTS': 'Tenemos un total de §Y$CURR$§W puntos diplomáticos.',
+    'war_we_lose_medium_title': '¡FIRMADA UNA PAZ VERGONZOSA!',
+}
+# Cambios dentro de textos largos.
+PARTS = {
+    'TOPBAR_POPULATION': [('ha cambiado en $CURR$ en la últimos', 'ha cambiado en $CHANGE$ en los últimos')],
+    'AI_LOVES_US_DESC1_MEDIUM': [('$TAG_0_0_$', '$TAG_0_0$')],
+    'AI_LOVES_US_DESC3_SHORT': [('$TAG_0_0J$', '$TAG_0_0$'), ('continuan', 'continúan'), ('facilmente', 'fácilmente')],
 }
 # Filas rotas en el juego: un ';' dentro del texto ingles descuadra todas las columnas.
 FULL = {
@@ -82,39 +106,83 @@ FULL = {
     'form_yugoslavia_title': ('Form Yugoslavia', 'Formar Yugoslavia'),
     'form_yugoslavia_desc': ('The South Slavs should be united in a single state.', 'Los eslavos del sur deberían unirse en un solo Estado.'),
 }
-base = {}
+SPANISH = 5  # columna del espanol en los .csv
+short = {k.lower(): es.encode('cp1252') for k, es in SHORT.items()}
+full = {k.lower(): (k, en.encode('cp1252'), es.encode('cp1252')) for k, (en, es) in FULL.items()}
+parts = {k.lower(): [(a.encode('cp1252'), b.encode('cp1252')) for a, b in v] for k, v in PARTS.items()}
+assert not any(b';' in x for x in short.values()) and not any(b';' in x[1] + x[2] for x in full.values())
+found = set()
+tidy = 0
+# Se corrige cada aparicion de la clave en su propia fila, para que no dependa del orden de carga.
 for p in sorted(glob.glob(G('localisation', '*.csv'))):
-    for line in rb(p).decode('cp1252', 'replace').splitlines():
-        c = line.split(';')
-        if c[0] and not c[0].startswith('#'):
-            base.setdefault(c[0].lower(), c)
-rows = ['CODE;ENGLISH;FRENCH;GERMAN;POLISH;SPANISH;ITALIAN;SWEDISH;CZECH;HUNGARIAN;DUTCH;PORTUGUESE;RUSSIAN;FINNISH;x']
-for k, es in SHORT.items():
-    c = base.get(k.lower())
-    assert c, k
-    en = c[1] if c[1].strip() else k
-    fr = c[2] if len(c) > 2 else ''
-    de = c[3] if len(c) > 3 else ''
-    rows.append(f'{c[0]};{en};{fr};{de};;{es};;;;;;;;;x')
-    note('textos', f'{c[0]}: {es[:60]}')
-for k, (en, es) in FULL.items():
-    rows.append(f'{k};{en};;;;{es};;;;;;;;;x')
-    note('textos', f'{k}: {es[:60]}')
-wb(D('localisation', '00_correcciones.csv'), ('\r\n'.join(rows) + '\r\n').encode('cp1252'))
+    orig = rb(p)
+    lines = orig.split(b'\n')
+    widths = collections.Counter(len(x.split(b';')) for x in lines if x.count(b';') > SPANISH)
+    mode = widths.most_common(1)[0][0] if widths else 0
+    for i, line in enumerate(lines):
+        cr = line.endswith(b'\r')
+        c = (line[:-1] if cr else line).split(b';')
+        if line.startswith(b'#'):
+            continue
+        k = c[0].decode('latin-1').lower()
+        if k in full:
+            n, en, es = full[k]
+            c = [n.encode(), en, b'', b'', b'', es] + [b''] * 8 + [b'x']
+            found.add(k)
+        elif k in short:
+            c += [b''] * (SPANISH + 1 - len(c))
+            c[SPANISH] = short[k]
+            found.add(k)
+        elif len(c) <= SPANISH:
+            continue
+        before = c[SPANISH]
+        es = c[SPANISH]
+        for a, b in parts.get(k, []):
+            assert a in es, (k, a)
+            es = es.replace(a, b)
+            found.add(k)
+        # Texto copiado de una hoja de calculo: el juego muestra las comillas de CSV y corta en los ';'.
+        if es.startswith(b'"') and len(c) > mode:
+            es += b',' + c.pop(SPANISH + 1)
+        if es.startswith(b'"') and es.endswith(b'"') and len(es) > 1:
+            es = es[1:-1]
+        es = es.replace(b'""', b'"').replace(b'$STR_0_0$', b'$STRING_0_0$')
+        es = re.sub(rb'(?<=\S)(?<!\\n) {2,}(?=\S)', b' ', es)
+        if es != before:
+            tidy += 1
+        c[SPANISH] = es
+        lines[i] = b';'.join(c) + (b'\r' if cr else b'')
+    d = b'\n'.join(lines)
+    if d != orig:
+        wb(p, d)
+assert set(short) <= found, sorted(set(short) - found)
+assert set(parts) <= found, sorted(set(parts) - found)
+note('textos', f'{tidy} filas con comillas, variables o espacios arreglados')
+new = [f for f in full if f not in found]
+if new:
+    d = rb(G('localisation', 'text.csv')).rstrip(b'\r\n')
+    for k in new:
+        n, en, es = full[k]
+        d += b'\r\n' + b';'.join([n.encode(), en, b'', b'', b'', es] + [b''] * 8 + [b'x'])
+    wb(G('localisation', 'text.csv'), d + b'\r\n')
+for k, v in SHORT.items():
+    note('textos', f'{k}: {v[:60]}')
+for k, v in FULL.items():
+    note('textos', f'{k}: {v[1][:60]}')
 
 # ---- Datos ----------------------------------------------------------------------------------
 # Dos historias para la misma provincia: se igualan para que no dependa del orden de carga.
-wb(D('history', 'provinces', 'indonesia', '1396 - Api.txt'), rb(G('history', 'provinces', 'asia', '1396 - Api.txt')))
+wb(G('history', 'provinces', 'indonesia', '1396 - Api.txt'), rb(G('history', 'provinces', 'asia', '1396 - Api.txt')))
 note('datos', 'provincia 1396: historia duplicada igualada')
 # Partidos gobernantes fuera de fecha al empezar en 1861.
 for f, date, party in (('ROM - Romania.txt', '1859.1.1', 'ROM_liberal_2'), ('CHI - China.txt', '1861.1.1', 'CHI_conservative_2')):
     d = rb(G('history', 'countries', f)).rstrip()
     d += f'\r\n\r\n{date} = {{ ruling_party = {party} }}\r\n'.encode('ascii')
-    wb(D('history', 'countries', f), d)
+    wb(G('history', 'countries', f), d)
     note('datos', f'{f}: {party} desde {date}')
 # Nombre de provincia en UTF-8 dentro de un archivo que debe ser ANSI.
 d = rb(G('history', 'units', '1861', 'HAI_oob.txt')).decode('utf-8').encode('cp1252')
-wb(D('history', 'units', '1861', 'HAI_oob.txt'), d)
+wb(G('history', 'units', '1861', 'HAI_oob.txt'), d)
 note('datos', 'HAI_oob.txt: convertido a ANSI')
 
 # ---- Rebeldes: ajuste minimo --------------------------------------------------------------------
@@ -128,7 +196,7 @@ for k, a, b in DEFS:
     t, n = re.subn(rf'(\b{k}\s*=\s*){re.escape(a)}\b', lambda m: m.group(1) + b, t)
     assert n == 1, k
     note('defines', f'{k}: {a} -> {b}')
-wb(D('common', 'defines.lua'), t.encode('latin-1'))
+wb(G('common', 'defines.lua'), t.encode('latin-1'))
 
 # ---- Condiciones: lo caro al final (misma logica, menos trabajo) ----------------------------------
 EXPENSIVE = {x.encode() for x in ('any_owned_province', 'any_country', 'any_neighbor_country', 'any_pop', 'any_state', 'any_core', 'all_core',
@@ -201,12 +269,10 @@ for z, key in (('events', rb'\btrigger\s*=\s*\{'), ('decisions', rb'\bpotential\
         a = sorted(m.group(0) for m in TK.finditer(orig) if not m.group(0).startswith(b'#'))
         b = sorted(m.group(0) for m in TK.finditer(d) if not m.group(0).startswith(b'#'))
         assert a == b, pth
-        wb(D(z, os.path.basename(pth)), d)
+        wb(pth, d)
         total += len(edits)
         note('condiciones', f'{z}/{os.path.basename(pth)}: {len(edits)}')
 
-with open(modfile, 'wb') as f:
-    f.write(b'name = "Victoria 2 Corregido"\r\npath = "mod/V2_Corregido"\r\n')
 with open(logpath, 'w', encoding='utf-8') as f:
     for k in sorted(log):
         f.write(f'\n[{k}] {len(log[k])}\n')
@@ -215,5 +281,6 @@ with open(logpath, 'w', encoding='utf-8') as f:
 print('condiciones reordenadas', total)
 for k in sorted(log):
     print(f'{k}: {len(log[k])}')
-n = sum(len(fn) for _, _, fn in os.walk(dst))
-print('archivos en el paquete', n)
+print('archivos cambiados', len(set(changed)))
+for x in sorted(set(changed)):
+    print(' ', x)
