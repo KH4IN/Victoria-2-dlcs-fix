@@ -2,12 +2,12 @@
 
 Este repositorio **no contiene archivos del juego ni de ningún mod**: son propiedad de sus autores. Solo guarda scripts, herramientas y documentación. Las correcciones se aplican sobre una copia del juego.
 
-UPM queda fuera de este trabajo: se corregirá aparte, más adelante.
+UPM va aparte, en la carpeta [`upm/`](../upm/).
 
 ## Cómo se aplica
 
 ```bash
-python -I paquete/base_fix.py "<juego>" "<copia_de_seguridad>" registro.txt
+python -I juego-base/base_fix.py "<juego>" "<copia_de_seguridad>" registro.txt
 ```
 
 Corrige directamente los archivos del juego: no crea ningún mod ni toca `v2game.exe`. Después el juego se abre como siempre, con el launcher o con `v2game.exe`. Antes de cambiar cada archivo guarda el original en la carpeta de copia de seguridad. Si el juego ya está corregido, se niega a aplicarlo otra vez.

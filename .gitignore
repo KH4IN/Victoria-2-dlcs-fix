@@ -1,2 +1,2 @@
-herramientas/huella_*.txt
-
+**/huella_*.txt
+__pycache__/
