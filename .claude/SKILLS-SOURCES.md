@@ -13,3 +13,8 @@
 | VoltAgent/awesome-design-md | 84 DESIGN.md de referencia (no es una skill) | docs/awesome-design-md/ |
 
 Copiadas de la rama por defecto de cada repo el 2026-11-01. Se eliminaron las carpetas `tests/` incluidas.
+
+## Análisis de malware (mukul975/Anthropic-Cybersecurity-Skills, commit 54a7988)
+
+performing-static-malware-analysis-with-pe-studio, performing-malware-triage-with-yara, analyzing-packed-malware-with-upx-unpacker, reverse-engineering-malware-with-ghidra, reverse-engineering-dotnet-malware-with-dnspy, extracting-iocs-from-malware-samples, analyzing-malware-persistence-with-autoruns.
+Revisadas por patrones de riesgo y con Windows Defender: 0 detecciones.
