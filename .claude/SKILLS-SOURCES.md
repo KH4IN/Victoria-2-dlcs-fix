@@ -6,7 +6,7 @@
 | DietrichGebert/ponytail | ponytail, ponytail-audit, -debt, -gain, -help, -review | .claude/skills/ |
 | rtk-ai/rtk | binario v0.49.0 (SHA-256 fijado) + hook PreToolUse | .claude/hooks/install-rtk.sh, .claude/settings.json |
 | affaan-m/ECC | 14 agentes + token-budget-advisor (sin hooks) | .claude/agents/, .claude/skills/ |
-| addyosmani/agent-skills | 25 skills de ingeniería | .claude/skills/ |
+| addyosmani/agent-skills | 25 skills de ingeniería + 3 agentes (`code-reviewer` no se copia: coincide con el de ECC) | .claude/skills/, .claude/agents/ |
 | Leonxlnx/taste-skill | taste-skill | .claude/skills/ |
 | nextlevelbuilder/ui-ux-pro-max-skill | ui-ux-pro-max, design, design-system, brand, banner-design, slides, ui-styling | .claude/skills/ |
 | microsoft/playwright-cli | playwright-cli (requiere `npm i -g @playwright/cli@0.1.23`) | .claude/skills/ |
