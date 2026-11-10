@@ -1,0 +1,18 @@
+﻿Correcciones de Universal Project Mod 2.05 para Victoria 2 v3.04.
+No incluye el juego ni el mod: necesitas tener los dos.
+
+1. Haz una copia de la carpeta del juego para jugar con UPM.
+2. Corrige esa copia con Correcciones_V2_base.zip, si aún no lo está.
+3. Instala en ella UPM sin tocar: la carpeta mod\UPM y el archivo mod\UPM.mod.
+4. Cierra el juego.
+5. Descomprime esta carpeta dentro de la copia, donde está v2game.exe.
+6. Haz doble clic en "Aplicar correcciones UPM.bat".
+7. Abre victoria2.exe y marca Universal Project Mod.
+
+El código del menú debe ser V2 v3.04 (DWUE).
+La primera vez en un PC puede salir otro: abre y cierra el juego una vez.
+
+Solo funciona con la misma versión de UPM para la que se creó. Comprueba los archivos antes de tocar nada: si tu copia es distinta, avisa y no cambia nada.
+
+Los originales cambiados se guardan en _copia_antes_de_corregir_UPM.
+Para volver atrás, borra mod\UPM e instala otra vez UPM sin tocar.
