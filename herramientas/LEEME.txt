@@ -1,0 +1,48 @@
+HERRAMIENTAS PARA VICTORIA 2
+============================
+
+Esta carpeta va dentro de la carpeta del juego (junto a v2game.exe).
+El juego ya está corregido: ábrelo como siempre, con el launcher o con v2game.exe.
+Estas herramientas son opcionales.
+
+Comprobar version.bat
+  Crea tu "huella" (un archivo huella_xxx.txt). Pásasela a un amigo y él la compara
+  con la suya: el programa dice exactamente qué archivos os separan.
+
+Instalar mod.bat
+  Arrastra encima el .zip de un mod, o ábrelo y elige el archivo. Revisa el zip,
+  rechaza los que traen ejecutables, lo analiza con Windows Defender y lo coloca
+  en mod/. Si ya existía, guarda la versión anterior en mod/_copias/.
+
+V2_parche_para_amigos.zip
+  Los archivos corregidos del juego. Tus amigos lo descomprimen encima de su carpeta
+  del juego, aceptando reemplazar, y ya tenéis la misma versión.
+
+
+JUGAR CON AMIGOS SIN "VERSIONES DISTINTAS"
+------------------------------------------
+Abajo a la izquierda del menú verás: V2 v3.04 (YYWO).
+Ese código de 4 letras tiene que ser igual para todos. Cambia por:
+
+  1. Elegir un mod (cada mod tiene su código).
+  2. Tener un v2game.exe distinto. Todos debéis usar la misma copia del juego.
+  3. Tener distinto algún archivo de: common, decisions, events, history,
+     inventions, technologies, units, poptypes, script o battleplans.
+  4. La primera vez que el juego arranca sin caché de mapa sale otro código.
+     Abre y cierra el juego una vez, y al siguiente arranque saldrá el bueno.
+
+Tener un mod instalado pero sin activar NO cambia el código.
+Interfaz, gráficos, textos y música tampoco.
+
+
+MAPA EN BLANCO EN MULTIJUGADOR
+------------------------------
+No se ha podido reproducir ni corregir: ocurre dentro del propio ejecutable.
+Lo que os funciona sigue siendo lo mejor: pasarle la partida guardada.
+Antes de jugar, comprobad que todos tenéis el mismo código de versión.
+
+
+EL DINERO DE LA BARRA SUPERIOR
+------------------------------
+La cifra entre paréntesis es lo que ganasteis AYER, no el balance previsto, y varía
+mucho de un día a otro. El dato fiable es "Balance diario previsto" en Presupuesto.
